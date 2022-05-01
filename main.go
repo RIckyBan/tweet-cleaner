@@ -102,8 +102,8 @@ func main() {
 	var deleteIDs []int64
 	layout = "Mon Jan 02 15:04:05 -0700 2006"
 	for _, tw := range tweets {
-		tweetDate, _ := time.Parse(layout, tw.Tweet.CreatedAt)
-		if tweetDate.After(fromDate) && tweetDate.Before(toDate) {
+		td, _ := time.Parse(layout, tw.Tweet.CreatedAt)
+		if !td.Before(fromDate) && !td.After(toDate) { // fromDate <= td <= toDate
 			id, _ := strconv.ParseInt(tw.Tweet.ID, 10, 64)
 			deleteIDs = append(deleteIDs, id)
 		}
@@ -111,8 +111,8 @@ func main() {
 
 	counts := len(deleteIDs)
 	log.Printf("Deleting %d tweets", counts)
-	bar := progressbar.New(counts)
 
+	bar := progressbar.New(counts)
 	// Delete tweets
 	for _, id := range deleteIDs {
 		bar.Add(1)
