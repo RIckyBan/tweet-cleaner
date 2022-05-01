@@ -12,6 +12,7 @@ import (
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/joho/godotenv"
+	"github.com/schollz/progressbar"
 )
 
 type TweetData struct {
@@ -96,9 +97,8 @@ func main() {
 	token := oauth1.NewToken(at, as)
 	httpClient := config.Client(oauth1.NoContext, token)
 
-	// Twitter client
+	// prepare client
 	client := twitter.NewClient(httpClient)
-
 	tweets := loadJson("tweet.json")
 
 	// filter tweets
@@ -112,10 +112,13 @@ func main() {
 		}
 	}
 
-	log.Printf("Deleting %d tweets", len(deleteIDs))
+	counts := len(deleteIDs)
+	log.Printf("Deleting %d tweets", counts)
+	bar := progressbar.New(counts)
 
 	// Delete tweets
 	for _, id := range deleteIDs {
+		bar.Add(1)
 		deleteTweet(client, id)
 		// sleep for 300ms
 		time.Sleep(300 * time.Millisecond)
