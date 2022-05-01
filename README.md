@@ -24,7 +24,7 @@ Script to delete tweets with Golang
 	Run the command below.
 
 	```shell
-	sed '1d' tweet.js | sed '1i [' > tweet.json
+	$ sed '1d' tweet.js | sed '1i [' > tweet.json
 	```
 
 
