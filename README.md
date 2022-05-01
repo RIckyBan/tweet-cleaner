@@ -16,7 +16,7 @@ Script to delete tweets with Golang
 
 2. Prepare your archived twitter data
 
-	Archive your twitter data from [here](https://twitter.com/settings/your_twitter_data).
+	Download your archived twitter data from [here](https://twitter.com/settings/your_twitter_data).
 	Then place `tweeet.js` file inside to the project root.
 
 3. Format your twitter data into json
