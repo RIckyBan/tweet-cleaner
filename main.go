@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -67,6 +67,30 @@ func deleteTweet(client *twitter.Client, id int64) {
 }
 
 func main() {
+	fromDateString := flag.String("from", "", "Date to start from")
+	toDateString := flag.String("to", "", "Date to end at")
+	flag.Parse()
+
+	if *fromDateString == "" || *toDateString == "" {
+		log.Fatal("Please provide a date range")
+	}
+
+	layout := "2006-01-02"
+	fromDate, err := time.Parse(layout, *fromDateString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	toDate, err := time.Parse(layout, *toDateString)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if fromDate.After(toDate) {
+		log.Fatal("From-date must be before to-date")
+	}
+
+	log.Println("Fetching tweets from ", fromDate.Format(layout), " to ", toDate.Format(layout))
+
 	ck, cs, at, as := loadSecrets()
 	config := oauth1.NewConfig(ck, cs)
 	token := oauth1.NewToken(at, as)
@@ -79,8 +103,10 @@ func main() {
 
 	// filter tweets
 	var deleteIDs []int64
+	layout = "Mon Jan 02 15:04:05 -0700 2006"
 	for _, tw := range tweets {
-		if strings.Contains(tw.Tweet.CreatedAt, "2013") {
+		tweetDate, _ := time.Parse(layout, tw.Tweet.CreatedAt)
+		if tweetDate.After(fromDate) && tweetDate.Before(toDate) {
 			id, _ := strconv.ParseInt(tw.Tweet.ID, 10, 64)
 			deleteIDs = append(deleteIDs, id)
 		}
@@ -88,7 +114,7 @@ func main() {
 
 	log.Printf("Deleting %d tweets", len(deleteIDs))
 
-	// Delete a Tweet
+	// Delete tweets
 	for _, id := range deleteIDs {
 		deleteTweet(client, id)
 		// sleep for 300ms
