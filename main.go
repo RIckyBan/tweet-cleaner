@@ -54,16 +54,13 @@ func loadSecrets() (string, string, string, string) {
 
 func deleteTweet(client *twitter.Client, id int64) {
 	// Delete a Tweet
-	log.Println("Deleting Tweet with ID:", id)
 	params := &twitter.StatusDestroyParams{TrimUser: twitter.Bool(true)}
 	_, resp, err := client.Statuses.Destroy(id, params)
 	if err != nil {
 		log.Println(err)
 	}
-	if resp.StatusCode == 200 {
-		log.Println("Successfully deleted")
-	} else {
-		log.Println("Failed to delete")
+	if resp.StatusCode != 200 {
+		log.Printf("Failed to delete tweet with ID: %d", id)
 	}
 }
 
